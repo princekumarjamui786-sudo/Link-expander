@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Unshortener - Link Expander</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 40px 35px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        h1 { text-align: center; color: #2d2b4e; font-size: 28px; margin-bottom: 8px; }
+        .subtitle { text-align: center; color: #666; font-size: 14px; margin-bottom: 25px; }
+        .input-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        input {
+            flex: 1; padding: 14px 18px; border: 2px solid #ddd; border-radius: 12px;
+            font-size: 16px; transition: 0.3s; outline: none;
+        }
+        input:focus { border-color: #302b63; }
+        button {
+            padding: 14px 28px; background: linear-gradient(135deg, #302b63, #24243e);
+            color: white; border: none; border-radius: 12px; font-size: 16px;
+            font-weight: 600; cursor: pointer; transition: 0.3s; white-space: nowrap;
+        }
+        button:hover { transform: scale(1.03); box-shadow: 0 5px 20px rgba(48, 43, 99, 0.4); }
+        button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        #result {
+            margin-top: 20px; padding: 18px; border-radius: 12px; background: #f5f5f9;
+            display: none; word-break: break-all; border-left: 4px solid #302b63;
+        }
+        #result .label { font-size: 13px; color: #888; font-weight: 600; text-transform: uppercase; }
+        #result .link { margin-top: 6px; font-size: 16px; color: #2d2b4e; font-weight: 500; }
+        #result .link a { color: #302b63; text-decoration: none; }
+        #result .link a:hover { text-decoration: underline; }
+        .error { color: #d32f2f !important; border-left-color: #d32f2f !important; }
+        .copy-btn {
+            margin-top: 10px; padding: 8px 18px; background: #e8e8f0; border: none;
+            border-radius: 8px; font-size: 13px; cursor: pointer; transition: 0.2s;
+        }
+        .copy-btn:hover { background: #d5d5e0; }
+        .loader {
+            display: inline-block; width: 18px; height: 18px; border: 3px solid #ddd;
+            border-top-color: #302b63; border-radius: 50%; animation: spin 0.7s linear infinite;
+            vertical-align: middle; margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #aaa; }
+        .examples { margin-top: 12px; font-size: 13px; color: #999; }
+        .examples span { cursor: pointer; color: #302b63; font-weight: 500; text-decoration: underline dotted; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 Link Expander</h1>
+        <p class="subtitle">Short URL डालें और असली लिंक जानें</p>
+        <div class="input-group">
+            <input type="text" id="urlInput" placeholder="Paste short URL here... (e.g., bit.ly/xyz)">
+            <button id="expandBtn">Expand</button>
+        </div>
+        <div class="examples">
+            📌 Try: <span onclick="setExample('https://bit.ly/3Xyz123')">bit.ly</span> · 
+            <span onclick="setExample('https://tinyurl.com/abc123')">tinyurl</span> · 
+            <span onclick="setExample('https://shorturl.at/xyz')">shorturl</span>
+        </div>
+        <div id="result">
+            <div class="label">✅ Expanded URL</div>
+            <div class="link" id="expandedLink"></div>
+            <button class="copy-btn" id="copyBtn">📋 Copy Link</button>
+        </div>
+        <div class="footer">Made with ❤️ | Free to use</div>
+    </div>
+    <script>
+        const urlInput = document.getElementById('urlInput');
+        const expandBtn = document.getElementById('expandBtn');
+        const resultDiv = document.getElementById('result');
+        const expandedLink = document.getElementById('expandedLink');
+        const copyBtn = document.getElementById('copyBtn');
+
+        function setExample(url) { urlInput.value = url; expandUrl(); }
+
+        async function expandUrl() {
+            const url = urlInput.value.trim();
+            if (!url) { alert('Please enter a URL first!'); return; }
+            expandBtn.disabled = true;
+            expandBtn.innerHTML = '<span class="loader"></span> Loading...';
+            resultDiv.style.display = 'none';
+            resultDiv.className = '';
+            try {
+                const response = await fetch(`/expand?url=${encodeURIComponent(url)}`);
+                const data = await response.json();
+                if (data.error) {
+                    resultDiv.className = 'error';
+                    expandedLink.textContent = '❌ ' + data.error + (data.details ? ' - ' + data.details : '');
+                    resultDiv.style.display = 'block';
+                    return;
+                }
+                const finalUrl = data.expanded || data.original;
+                expandedLink.innerHTML = `<a href="${finalUrl}" target="_blank">${finalUrl}</a>`;
+                resultDiv.className = '';
+                resultDiv.style.display = 'block';
+                expandedLink.dataset.url = finalUrl;
+            } catch (error) {
+                resultDiv.className = 'error';
+                expandedLink.textContent = '❌ Something went wrong. Please try again.';
+                resultDiv.style.display = 'block';
+            } finally {
+                expandBtn.disabled = false;
+                expandBtn.innerHTML = 'Expand';
+            }
+        }
+        expandBtn.addEventListener('click', expandUrl);
+        urlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') expandUrl(); });
+        copyBtn.addEventListener('click', () => {
+            const url = expandedLink.dataset.url || expandedLink.textContent;
+            if (url && !url.startsWith('❌')) {
+                navigator.clipboard.writeText(url).then(() => {
+                    copyBtn.textContent = '✅ Copied!';
+                    setTimeout(() => copyBtn.textContent = '📋 Copy Link', 2000);
+                }).catch(() => {
+                    const range = document.createRange();
+                    range.selectNode(expandedLink);
+                    window.getSelection().removeAllRanges();
+                    window.getSelection().addRange(range);
+                    document.execCommand('copy');
+                    copyBtn.textContent = '✅ Copied!';
+                    setTimeout(() => copyBtn.textContent = '📋 Copy Link', 2000);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
