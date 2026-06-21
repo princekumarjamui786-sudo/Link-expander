@@ -16,33 +16,32 @@ app.get('/expand', async (req, res) => {
     try {
         let finalUrl = shortUrl;
 
-        // 🎯 अगर लिंक मुश्किल (vplink या earnlinks) है, तो असली ब्राउज़र चलाओ
+        // 🎯 अगर लिंक मुश्किल (vplink या earnlinks) है
         if (shortUrl.includes('vplink.in') || shortUrl.includes('earnlinks.in')) {
             console.log('🚀 Tricky link detected, launching browser...');
             
+            // ⭐ Chrome को ढूंढने का सही तरीका (Render के लिए)
             const browser = await puppeteer.launch({
                 headless: 'new',
                 args: [
                     '--no-sandbox',
                     '--disable-setuid-sandbox',
-                    '--disable-dev-shm-usage'
+                    '--disable-dev-shm-usage',
+                    '--disable-gpu'
                 ]
             });
             
             const page = await browser.newPage();
-            
-            // खुद को Real Browser बनाओ
             await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
             
-            // पेज खोलो
+            // पेज खोलो (60 सेकंड का समय दो)
             await page.goto(shortUrl, { waitUntil: 'networkidle2', timeout: 60000 });
             
-            // 🔥 बटन ढूंढो और क्लिक करो (जादू यहीं है)
+            // 🔥 बटन ढूंढो और क्लिक करो
             await page.evaluate(() => {
                 const allElements = document.querySelectorAll('a, button');
                 for (let el of allElements) {
                     const text = el.innerText.toLowerCase();
-                    // अगर बटन पर Continue, Get Link, Free Download, Proceed लिखा है तो क्लिक करो
                     if (text.includes('continue') || text.includes('get link') || text.includes('free download') || text.includes('proceed') || text.includes('click here')) {
                         el.click();
                         break;
@@ -50,10 +49,9 @@ app.get('/expand', async (req, res) => {
                 }
             });
 
-            // 5 सेकंड इंतज़ार करो (बटन दबने के बाद लिंक आने के लिए)
-            await new Promise(r => setTimeout(r, 5000));
+            // 8 सेकंड इंतज़ार (बटन दबने के बाद लिंक आने के लिए)
+            await new Promise(r => setTimeout(r, 8000));
             
-            // आखिरी वाला लिंक (जहाँ पहुँच गए) पकड़ो
             finalUrl = page.url();
             await browser.close();
             console.log('✅ Final URL found:', finalUrl);
