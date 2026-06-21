@@ -3,86 +3,432 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URL Unshortener - Link Expander</title>
+    <title>✨ Link Expander Pro - Unshorten URL</title>
+    <!-- Google Fonts (सुंदर फॉन्ट) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* ----- सारी सेटिंग्स (Reset & Base) ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            font-family: 'Inter', sans-serif;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            /* 🔮 डार्क पर्पल बैकग्राउंड जो हिलता-डुलता है */
+            background: #0b0719;
+            background-image: radial-gradient(circle at 20% 30%, #1a1040 0%, #08041a 80%);
+            overflow-x: hidden;
+            position: relative;
         }
-        .container {
-            background: rgba(255,255,255,0.95);
-            border-radius: 20px;
-            padding: 40px 35px;
-            max-width: 600px;
+
+        /* ----- 🔮 फ्लोटिंग बुलबुले (Background Animation) ----- */
+        .glow-sphere {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: floatBlob 15s infinite alternate ease-in-out;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .sphere1 {
+            width: 400px;
+            height: 400px;
+            background: #6d28d9;
+            top: -100px;
+            left: -100px;
+            animation-duration: 18s;
+        }
+        .sphere2 {
+            width: 500px;
+            height: 500px;
+            background: #7c3aed;
+            bottom: -150px;
+            right: -150px;
+            animation-duration: 22s;
+            animation-delay: -5s;
+        }
+        .sphere3 {
+            width: 300px;
+            height: 300px;
+            background: #4f46e5;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-duration: 25s;
+            animation-delay: -10s;
+            opacity: 0.2;
+        }
+
+        @keyframes floatBlob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(60px, -40px) scale(1.1); }
+            66% { transform: translate(-40px, 30px) scale(0.9); }
+            100% { transform: translate(30px, -50px) scale(1.05); }
+        }
+
+        /* ----- 🥛 Glassmorphism Container (काँच वाला मुख्य डिब्बा) ----- */
+        .glass-card {
+            position: relative;
+            z-index: 10;
+            max-width: 620px;
             width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            background: rgba(18, 10, 40, 0.65);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 40px;
+            padding: 45px 35px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: all 0.4s ease;
         }
-        h1 { text-align: center; color: #2d2b4e; font-size: 28px; margin-bottom: 8px; }
-        .subtitle { text-align: center; color: #666; font-size: 14px; margin-bottom: 25px; }
-        .input-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        input {
-            flex: 1; padding: 14px 18px; border: 2px solid #ddd; border-radius: 12px;
-            font-size: 16px; transition: 0.3s; outline: none;
+
+        /* ----- 🔥 Heading और Subtitle (Glow वाला) ----- */
+        .brand {
+            text-align: center;
+            margin-bottom: 30px;
         }
-        input:focus { border-color: #302b63; }
-        button {
-            padding: 14px 28px; background: linear-gradient(135deg, #302b63, #24243e);
-            color: white; border: none; border-radius: 12px; font-size: 16px;
-            font-weight: 600; cursor: pointer; transition: 0.3s; white-space: nowrap;
+        .brand h1 {
+            font-size: 34px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #d8b4fe, #a78bfa, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(168, 85, 247, 0.3);
+            letter-spacing: -0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
         }
-        button:hover { transform: scale(1.03); box-shadow: 0 5px 20px rgba(48, 43, 99, 0.4); }
-        button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .brand h1 .icon {
+            -webkit-text-fill-color: initial;
+            color: #d8b4fe;
+            filter: drop-shadow(0 0 15px #a855f7);
+        }
+        .brand .subtitle {
+            color: #a5a0c7;
+            font-size: 16px;
+            font-weight: 400;
+            margin-top: 8px;
+            letter-spacing: 0.3px;
+            background: rgba(255, 255, 255, 0.03);
+            display: inline-block;
+            padding: 4px 18px;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        /* ----- 📥 Input Area (Glowing Glass Input) ----- */
+        .input-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .input-group input {
+            flex: 1;
+            min-width: 200px;
+            padding: 18px 22px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #f0ecff;
+            outline: none;
+            transition: all 0.35s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+            font-family: 'Inter', sans-serif;
+        }
+        .input-group input::placeholder {
+            color: #6a6490;
+            font-weight: 400;
+            font-size: 15px;
+        }
+        .input-group input:focus {
+            border-color: #a78bfa;
+            background: rgba(255, 255, 255, 0.07);
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.15), inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* 🚀 Expand Button (Neon Glow वाला) */
+        .btn-expand {
+            padding: 18px 36px;
+            background: linear-gradient(135deg, #7c3aed, #4f46e5);
+            border: none;
+            border-radius: 20px;
+            font-size: 17px;
+            font-weight: 700;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 25px rgba(124, 58, 237, 0.3);
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: 'Inter', sans-serif;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .btn-expand:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 40px rgba(124, 58, 237, 0.5), 0 0 60px rgba(124, 58, 237, 0.2);
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        }
+        .btn-expand:active {
+            transform: scale(0.95);
+        }
+        .btn-expand:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* ----- Examples (छोटे लिंक सुझाव) ----- */
+        .examples {
+            margin-top: 8px;
+            margin-bottom: 22px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px 12px;
+            font-size: 14px;
+            color: #7a75a0;
+        }
+        .examples .label {
+            opacity: 0.7;
+            margin-right: 4px;
+        }
+        .examples .pill {
+            background: rgba(255, 255, 255, 0.04);
+            padding: 5px 14px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: #b8b0e0;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-weight: 500;
+            font-size: 13px;
+            backdrop-filter: blur(5px);
+        }
+        .examples .pill:hover {
+            background: rgba(168, 85, 247, 0.15);
+            color: #d8b4fe;
+            border-color: #7c3aed;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* ----- 🎯 Result Box (जादू यहाँ दिखेगा) ----- */
         #result {
-            margin-top: 20px; padding: 18px; border-radius: 12px; background: #f5f5f9;
-            display: none; word-break: break-all; border-left: 4px solid #302b63;
+            margin-top: 25px;
+            padding: 22px 25px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: none;
+            word-break: break-all;
+            border-left: 5px solid #a78bfa;
+            box-shadow: inset 0 0 30px rgba(168, 85, 247, 0.05);
+            transition: all 0.4s ease;
+            animation: fadeSlideIn 0.5s cubic-bezier(0.23, 1, 0.32, 1);
         }
-        #result .label { font-size: 13px; color: #888; font-weight: 600; text-transform: uppercase; }
-        #result .link { margin-top: 6px; font-size: 16px; color: #2d2b4e; font-weight: 500; }
-        #result .link a { color: #302b63; text-decoration: none; }
-        #result .link a:hover { text-decoration: underline; }
-        .error { color: #d32f2f !important; border-left-color: #d32f2f !important; }
+        #result .label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #8b82b5;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #result .label .badge {
+            background: rgba(168, 85, 247, 0.2);
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 10px;
+            color: #a78bfa;
+            border: 1px solid rgba(168, 85, 247, 0.1);
+        }
+        #result .link {
+            font-size: 17px;
+            font-weight: 600;
+            color: #f0ecff;
+            padding: 8px 0;
+            line-height: 1.6;
+        }
+        #result .link a {
+            color: #c4b5fd;
+            text-decoration: none;
+            border-bottom: 2px dotted rgba(168, 85, 247, 0.2);
+            transition: 0.3s;
+            word-break: break-all;
+        }
+        #result .link a:hover {
+            color: #ffffff;
+            border-bottom-color: #a78bfa;
+            text-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+        }
+        .error-box {
+            border-left-color: #f87171 !important;
+            background: rgba(248, 113, 113, 0.05) !important;
+        }
+        .error-box .link {
+            color: #fca5a5 !important;
+        }
+
         .copy-btn {
-            margin-top: 10px; padding: 8px 18px; background: #e8e8f0; border: none;
-            border-radius: 8px; font-size: 13px; cursor: pointer; transition: 0.2s;
+            margin-top: 15px;
+            padding: 10px 24px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #b8b0e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+            font-family: 'Inter', sans-serif;
         }
-        .copy-btn:hover { background: #d5d5e0; }
+        .copy-btn:hover {
+            background: rgba(168, 85, 247, 0.15);
+            border-color: #7c3aed;
+            color: #ffffff;
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.1);
+        }
+
+        @keyframes fadeSlideIn {
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ----- Loader (Spinner) ----- */
         .loader {
-            display: inline-block; width: 18px; height: 18px; border: 3px solid #ddd;
-            border-top-color: #302b63; border-radius: 50%; animation: spin 0.7s linear infinite;
-            vertical-align: middle; margin-right: 8px;
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid #a78bfa;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+            vertical-align: middle;
+            margin-right: 12px;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #aaa; }
-        .examples { margin-top: 12px; font-size: 13px; color: #999; }
-        .examples span { cursor: pointer; color: #302b63; font-weight: 500; text-decoration: underline dotted; }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ----- Footer ----- */
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 13px;
+            color: #4a4570;
+            letter-spacing: 0.5px;
+            border-top: 1px solid rgba(255,255,255,0.03);
+            padding-top: 22px;
+            font-weight: 400;
+        }
+        .footer span {
+            color: #7c3aed;
+            filter: drop-shadow(0 0 10px rgba(124,58,237,0.2));
+        }
+
+        /* ----- Mobile Friendly (छोटी स्क्रीन) ----- */
+        @media (max-width: 550px) {
+            .glass-card {
+                padding: 30px 20px;
+                border-radius: 28px;
+            }
+            .brand h1 {
+                font-size: 26px;
+            }
+            .input-group input {
+                padding: 16px 18px;
+                font-size: 15px;
+                min-width: 150px;
+            }
+            .btn-expand {
+                padding: 16px 24px;
+                font-size: 15px;
+                width: 100%;
+                justify-content: center;
+            }
+            #result .link {
+                font-size: 15px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔗 Link Expander</h1>
-        <p class="subtitle">Short URL डालें और असली लिंक जानें</p>
+
+    <!-- 🔮 Background Glowing Spheres (पीछे हिलते बुलबुले) -->
+    <div class="glow-sphere sphere1"></div>
+    <div class="glow-sphere sphere2"></div>
+    <div class="glow-sphere sphere3"></div>
+
+    <!-- 🥛 Main Glass Card -->
+    <div class="glass-card">
+
+        <div class="brand">
+            <h1>
+                <span class="icon">✦</span> 
+                Link Expander
+                <span class="icon" style="font-size: 20px;">⚡</span>
+            </h1>
+            <div class="subtitle">Short URL डालें और असली लिंक जानें</div>
+        </div>
+
+        <!-- Input Area -->
         <div class="input-group">
-            <input type="text" id="urlInput" placeholder="Paste short URL here... (e.g., bit.ly/xyz)">
-            <button id="expandBtn">Expand</button>
+            <input type="text" id="urlInput" placeholder="पेस्ट करें Short URL... (जैसे bit.ly/xyz)" autofocus>
+            <button class="btn-expand" id="expandBtn">🚀 Expand</button>
         </div>
+
+        <!-- Quick Examples -->
         <div class="examples">
-            📌 Try: <span onclick="setExample('https://bit.ly/3Xyz123')">bit.ly</span> · 
-            <span onclick="setExample('https://tinyurl.com/abc123')">tinyurl</span> · 
-            <span onclick="setExample('https://shorturl.at/xyz')">shorturl</span>
+            <span class="label">📌 Try:</span>
+            <span class="pill" onclick="setExample('https://bit.ly/3Xyz123')">bit.ly</span>
+            <span class="pill" onclick="setExample('https://tinyurl.com/abc123')">tinyurl</span>
+            <span class="pill" onclick="setExample('https://shorturl.at/xyz')">shorturl</span>
+            <span class="pill" onclick="setExample('https://vplink.in/NweO4q')">⚡vplink</span>
         </div>
+
+        <!-- 🎯 Result Display Box -->
         <div id="result">
-            <div class="label">✅ Expanded URL</div>
+            <div class="label">
+                ✅ EXPANDED URL
+                <span class="badge">LIVE</span>
+            </div>
             <div class="link" id="expandedLink"></div>
-            <button class="copy-btn" id="copyBtn">📋 Copy Link</button>
+            <button class="copy-btn" id="copyBtn">📋 Copy Link to Clipboard</button>
         </div>
-        <div class="footer">Made with ❤️ | Free to use</div>
+
+        <div class="footer">
+            Made with <span>❤️</span> by Prince | <span>✦</span> 100% Free
+        </div>
     </div>
+
+    <!-- 📜 JavaScript (बिल्कुल वही जो काम करता है) -->
     <script>
         const urlInput = document.getElementById('urlInput');
         const expandBtn = document.getElementById('expandBtn');
@@ -90,54 +436,75 @@
         const expandedLink = document.getElementById('expandedLink');
         const copyBtn = document.getElementById('copyBtn');
 
-        function setExample(url) { urlInput.value = url; expandUrl(); }
+        // Example links पर क्लिक करने पर
+        function setExample(url) {
+            urlInput.value = url;
+            expandUrl();
+        }
 
+        // Main Expand Function
         async function expandUrl() {
             const url = urlInput.value.trim();
-            if (!url) { alert('Please enter a URL first!'); return; }
+            if (!url) {
+                alert('कृपया पहले URL डालें!');
+                return;
+            }
+
+            // Loading state
             expandBtn.disabled = true;
             expandBtn.innerHTML = '<span class="loader"></span> Loading...';
             resultDiv.style.display = 'none';
             resultDiv.className = '';
+
             try {
                 const response = await fetch(`/expand?url=${encodeURIComponent(url)}`);
                 const data = await response.json();
+
                 if (data.error) {
-                    resultDiv.className = 'error';
+                    resultDiv.className = 'error-box';
                     expandedLink.textContent = '❌ ' + data.error + (data.details ? ' - ' + data.details : '');
                     resultDiv.style.display = 'block';
                     return;
                 }
+
                 const finalUrl = data.expanded || data.original;
                 expandedLink.innerHTML = `<a href="${finalUrl}" target="_blank">${finalUrl}</a>`;
                 resultDiv.className = '';
                 resultDiv.style.display = 'block';
                 expandedLink.dataset.url = finalUrl;
+
             } catch (error) {
-                resultDiv.className = 'error';
-                expandedLink.textContent = '❌ Something went wrong. Please try again.';
+                resultDiv.className = 'error-box';
+                expandedLink.textContent = '❌ कुछ गड़बड़ हो गई। कृपया फिर से प्रयास करें।';
                 resultDiv.style.display = 'block';
             } finally {
                 expandBtn.disabled = false;
-                expandBtn.innerHTML = 'Expand';
+                expandBtn.innerHTML = '🚀 Expand';
             }
         }
+
+        // Event Listeners
         expandBtn.addEventListener('click', expandUrl);
-        urlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') expandUrl(); });
+        urlInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') expandUrl();
+        });
+
+        // Copy Button Magic
         copyBtn.addEventListener('click', () => {
             const url = expandedLink.dataset.url || expandedLink.textContent;
             if (url && !url.startsWith('❌')) {
                 navigator.clipboard.writeText(url).then(() => {
                     copyBtn.textContent = '✅ Copied!';
-                    setTimeout(() => copyBtn.textContent = '📋 Copy Link', 2000);
+                    setTimeout(() => copyBtn.textContent = '📋 Copy Link to Clipboard', 2000);
                 }).catch(() => {
+                    // Fallback for old browsers
                     const range = document.createRange();
                     range.selectNode(expandedLink);
                     window.getSelection().removeAllRanges();
                     window.getSelection().addRange(range);
                     document.execCommand('copy');
                     copyBtn.textContent = '✅ Copied!';
-                    setTimeout(() => copyBtn.textContent = '📋 Copy Link', 2000);
+                    setTimeout(() => copyBtn.textContent = '📋 Copy Link to Clipboard', 2000);
                 });
             }
         });
